@@ -45,7 +45,8 @@ impl Person {
   // simulate one cycle
   fn step_one(&mut self, r: &mut ThreadRng) {
     // environments
-    let interest_rate = 1.02; // real-world interest_rate + 100%
+    // effective interest rate + 100%
+    let interest_rate = (1.0 + r.sample::<f32, _>(StandardNormal) / 2.0).abs();
     let base_spending = 1.9;
     let work_efficiency = 1.0;
     // personal stats
