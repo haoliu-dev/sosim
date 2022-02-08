@@ -7,7 +7,7 @@ pub struct InitConfig {
 }
 pub fn init(config: InitConfig) -> Country {
   let mut r = thread_rng(); // get a clone of thread_rng() and reuse
-  let inherited_wealth = 10.0;
+  let inherited_wealth = 20.0;
   let inherited_prestige = 0.0;
   let country = Country {
     age: 0,
