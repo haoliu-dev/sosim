@@ -16,13 +16,13 @@ pub fn start_macro_sim() -> io::Result<()>{
   let mut buffer = String::new();
 
   f.read_to_string(&mut buffer)?;
-  let r = Society::loadFromJson(&buffer);
+  let r = Society::load_json(&buffer);
   match r {
     Ok(s) => {
       println!("{:#?}", s)
     }
     Err(e) => {
-      println!("Error: {}", e)
+      println!("***Error: {}", e)
     }
   }
   Ok(())

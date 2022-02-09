@@ -57,9 +57,16 @@ enum ScienceType {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+struct Science {
+  name: String,
+  experience: f32, // experience accumulated, higher the experience, higher chance to level up
+  level: u8,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 enum IndustryKind {
   NaturalResource = 1, // 1st
-  Factory,             // 2nd
+  Production,             // 2nd
   Service,             // 3rd
 }
 
@@ -67,15 +74,29 @@ enum IndustryKind {
 struct Industry {
   name: String,
   kind: IndustryKind,
+  // upstream industries
+  upstreams: Vec<String>,
+  // services that may boost production of this industry(exclude equipment industry)
+  boosters: Vec<String>,
+  // automation ratio(1~INF): scale up efficiency,
+  // buy more and higher level equipments increase automation more
+  automation: f32, // default: 1.0f (no automation)
+}
+#[derive(Serialize, Deserialize, Debug)]
+struct Product {
+  name: String,
+  industry_chain: Vec<Industry>,
 }
 // country is the whole model of the macro economy of player's context
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Society {
   industries: Vec<Industry>,
+  sciences: Vec<Science>,
 }
 
 impl Society {
-  pub fn loadFromJson(json: &str) -> Result<Society> {
+  // various constructor
+  pub fn load_json(json: &str) -> Result<Society> {
     let r: Result<Society> = serde_json::from_str(json);
     return r;
   }

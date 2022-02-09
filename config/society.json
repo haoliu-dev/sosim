@@ -1,12 +1,37 @@
 {
-  "industries" : [
+  "sciences": [
     {
-      "name": "agriculture",
-      "kind": "NaturalResource"
+      "name": "physics",
+      "experience": 0,
+      "level": 1
     },
     {
-      "name": "fishing",
-      "kind": "NaturalResource"
+      "name": "biology",
+      "experience": 0,
+      "level": 1
+    }
+  ],
+  "industries" : [
+    {
+      "name": "mining",
+      "kind": "NaturalResource",
+      "upstreams": [],
+      "boosters": ["equipment"],
+      "automation": 1.0
+    },
+    {
+      "name": "equipment",
+      "kind": "Production",
+      "upstreams": ["mining"],
+      "boosters": ["infrastructure"],
+      "automation": 1.0
+    },
+    {
+      "name": "infrastructure",
+      "kind": "Service",
+      "upstreams": [],
+      "boosters": ["equipment"],
+      "automation": 1.0
     }
   ]
 }
