@@ -1,6 +1,32 @@
 use rand::prelude::*;
+use std::io;
+use std::io::prelude::*;
+use std::fs::File;
+
+
 mod person;
 use person::Person;
+
+mod macro_sim;
+use macro_sim::Society;
+
+// sim the country with macro economy simulator
+pub fn start_macro_sim() -> io::Result<()>{
+  let mut f = File::open("config/society.json")?;
+  let mut buffer = String::new();
+
+  f.read_to_string(&mut buffer)?;
+  let r = Society::loadFromJson(&buffer);
+  match r {
+    Ok(s) => {
+      println!("{:#?}", s)
+    }
+    Err(e) => {
+      println!("Error: {}", e)
+    }
+  }
+  Ok(())
+}
 
 pub struct InitConfig {
   pub person_count: usize,

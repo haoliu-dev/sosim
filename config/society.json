@@ -1,0 +1,12 @@
+{
+  "industries" : [
+    {
+      "name": "agriculture",
+      "kind": "NaturalResource"
+    },
+    {
+      "name": "fishing",
+      "kind": "NaturalResource"
+    }
+  ]
+}
