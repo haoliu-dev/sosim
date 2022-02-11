@@ -1,11 +1,5 @@
 {
-  "levels": [
-    {
-      "name": "门外汉",
-      "upgrade_cycle": 10,
-      "productivity": 1.0
-    }
-  ],
+
   "sciences": [
     {
       "name": "physics",
@@ -21,21 +15,24 @@
   "industries" : [
     {
       "name": "mining",
-      "kind": "NaturalResource",
+      "product_type": "Material",
       "capacity": [10,20],
-      "research": 0
+      "levels": [
+        {
+          "upgrade_cycle": 10,
+          "productivity": 1.0
+        }
+      ]
     },
     {
-      "name": "equipment",
-      "kind": "Production",
-      "capacity": [],
-      "research": 0
+      "name": "Phone",
+      "product_type": "Equipment",
+      "capacity": []
     },
     {
-      "name": "infrastructure",
-      "kind": "Service",
-      "capacity": [],
-      "research": 0
+      "name": "bank",
+      "product_type": "Service",
+      "capacity": []
     }
   ]
 }

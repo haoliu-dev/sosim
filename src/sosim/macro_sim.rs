@@ -38,26 +38,29 @@ struct Science {
   level: u8,
 }
 
-/// defines a uniform level in all industries and workers
-/// level ordinal is defined by its position in `Society.Levels` array
-#[derive(Serialize, Deserialize, Debug)]
-struct Level {
-  /// a human-readable name for that level
-  /// level ordinal is defined by its position in `Society.Levels` array
-  name: String,
 
+
+
+
+/// defines a level in one industries
+#[derive(Serialize, Deserialize, Debug)]
+struct IndustryLevel {
   /// minimum cycle needed to upgrade to next level for both industry and worker
   ///
   /// 1. worker upgrade rules
   /// worker's working cycle required to upgrade to next level.
   /// once a worker has worked `upgrade_cycle` cycles, the worker may upgrade
-  /// to next level with certain chance, which gets higher with `worker.intelligence`
+  /// to next level with certain chance
   ///
   /// 2. industry upgrade rules
   /// industry running for `upgrade_cycle` cycles on current max level may
-  /// upgrade to next level with certain chance, which gets higher with
-  /// `industry.research`
-  upgrade_cycle: u16,
+  /// upgrade to next level with certain chance
+  // upgrade_cycle: u16,
+
+  /// how many `research_unit` needed to upgrade to next level
+  /// a `research_unit` is defined as one same-level worker dedicate to
+  /// research in one cycle. Hire more researcher speeds the upgrade.
+  research: f32,
 
   /// one worker of the same level may produce how many units of products in one cycle
   /// this is used to determine how many workers are required for certain level and industry
@@ -65,14 +68,12 @@ struct Level {
   ///
   /// a industry may produce `productivity * worker_count` units of products
   /// (up to capacity for that level) for an given number in one industry
-  productivity: f32,
-}
+  worker_productivity: f32,
 
-#[derive(Serialize, Deserialize, Debug)]
-enum IndustryKind {
-  NaturalResource = 1, // 1st
-  Production,          // 2nd
-  Service,             // 3rd
+  /// one unit of same-level equipment may produce how many units of products in one cycle
+  /// `worker_productivity` and `equipment_productivity` defines the capital intensity
+  /// for this industry
+  equipment_productivity: f32,
 }
 
 /// This represents a whole Industry Department in the sim
@@ -80,16 +81,23 @@ enum IndustryKind {
 struct Industry {
   /// globally unique name of the industry
   name: String,
-  /// 1st(natural resource), 2nd(production) or 3rd(service) industry department
-  kind: IndustryKind,
+
+  //--- characteristics ---//
+
+  /// products it makes
+  products: Vec<Product>,
+
+  /// levels for this industry.
+  /// Different industry has different characteristics, like:
+  /// upgrade requirement and productivity
+  levels: Vec<IndustryLevel>,
 
   /// `<status>` production capacity of each level in this industry,
   /// here's how it works:
   /// 1. capacity(array) defines the maximum production unit per cycle(array element value)
   ///  for that level(array element index)
-  /// 2. you add capacity of a certain level by adding the `equipment product` of
-  /// that level, that `product.is_equipment_for (Vec<String>)` must include
-  /// the name of this industry
+  /// 2. you add capacity of a certain level by adding `Equipment` which is the output
+  /// of an industry whose product_type is `Equipment`
   /// 3. you may only produce up to the capacity given sufficient worker and input material
   ///
   /// For example, the following capacity means currently,
@@ -99,21 +107,56 @@ struct Industry {
   /// ```
   /// capacity = [150.0, 30.0, 12.0]
   /// ```
-  capacity: Vec<f32>,
+  // capacity: Vec<f32>,
 
-  /// accumulated research spending, the higher, the higher chance
-  /// to upgrade to next level once `level.upgrade_cycle` reached
-  research: f32,
+  /// how many units of equipment invested
+  equipments: f32,
+
+  /// researchers hired
+  researcher: u32,
+  /// workers hired
+  worker: u32,
+
+  // settings
+
+}
+
+// #[derive(Serialize, Deserialize, Debug)]
+// enum ProductType {
+//   /// argriculture, fishing, natural resources, coal, metal, gas...
+//   Material,
+//   /// increase industry capacity: equipment industry
+//   Equipment,
+//   /// end consumer goods of all kinds
+//   ConsumerGoods,
+//   /// provides service to industry and consumer
+//   Service,
+// }
+#[derive(Serialize, Deserialize, Debug)]
+struct ProductRecipe {
+  name: String,
+  unit: f32,
 }
 #[derive(Serialize, Deserialize, Debug)]
 struct Product {
+  /// unique name for this product
   name: String,
-  industry_chain: Vec<Industry>,
+
+  /// product level, also is the minimum required industry level to produce this
+  level: u8,
+
+  /// how many input product units needed to produce one unit of this product
+  /// if no material needed(like natural resource or service provider),
+  /// leave it empty
+  recipe: Vec<ProductRecipe>,
+
+  /// how much unit of it does one consumer need for each cycle
+  /// 0.0f means no consumer needs, it's a material or equipment for production
+  consumer_needs: f32,
 }
 // country is the whole model of the macro economy of player's context
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Society {
-  levels: Vec<Level>,
   industries: Vec<Industry>,
   sciences: Vec<Science>,
 }
@@ -125,33 +168,3 @@ impl Society {
     return r;
   }
 }
-
-struct IndustryDepartment {
-  kind: IndustryKind,
-  // efficiency related
-  // invested equipment boost efficiency in log(x) level
-  // invested equipment depreciates by certain rate per cycle
-  equipment_invested: f32,
-  equipment_depreciation_rate: f32, // 0~1
-  // status
-  capacity: f32, // production capacity
-  employee: f32, // employee count
-}
-
-// impl IndustryDepartment {
-//   // calculate output per cycle(given unrestricted input) for this industry:
-//   // worker.output = worker.basic_output * worker.skill * industry.efficiency
-//   fn efficiency(self, &industry_catalog:IndustryCatalog) -> f32 {
-//     match self.kind {
-//       IndustryType::Material => {
-//         self.equipment_invested * industry_catalog.getIndustry(IndustryType::Infrastructure)
-//       },
-//       IndustryType::Factory => {
-//         self.efficiency
-//       },
-//       IndustryType::Service => {
-
-//       }
-//     }
-//   }
-// }
