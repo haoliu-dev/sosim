@@ -16,7 +16,7 @@
       "name": "mining",
       "kind": "NaturalResource",
       "upstreams": [],
-      "boosters": ["equipment"],
+      "boosters": ["infrastructure"],
       "automation": 1.0
     },
     {
@@ -30,7 +30,7 @@
       "name": "infrastructure",
       "kind": "Service",
       "upstreams": [],
-      "boosters": ["equipment"],
+      "boosters": [],
       "automation": 1.0
     }
   ]

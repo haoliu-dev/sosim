@@ -1,4 +1,4 @@
-// this module models society from macro economic view
+/// this module models society from macro economic view
 use serde::{Deserialize, Serialize};
 use serde_json::Result;
 
@@ -30,32 +30,7 @@ enum ComprehensiveIndustryType {
   PublicService, // Government, self-govern
 }
 
-enum IndustryTypeV2 {
-  // 1st; output(material) = land * output
-  Material, // Agriculture, Mining and Material
-  // 2nd; input(land,material,human), output(goods)
-  Equipment,     // Equipment Production
-  ConsumerGoods, // Durable, NonDurable, food, beverage
-  // 3rd; input(land,human), output(service)
-  Infrastructure,  // land improvements, power, gas, water, communication
-  BusinessService, // Financial/Information/...
-  ConsumerService,
-  // PublicService,
-  HealthCare,
-  Education,
-  Entertainment,
-}
-
-enum ScienceType {
-  Physics,
-  Chemistry,
-  Biology,
-  Environment,
-  Admin,
-  Arts,
-  Economy,
-}
-
+/// Define one science in the sim
 #[derive(Serialize, Deserialize, Debug)]
 struct Science {
   name: String,
@@ -70,17 +45,32 @@ enum IndustryKind {
   Service,             // 3rd
 }
 
+/// This represents a whole Industry Department in the sim
+/// # a `Industry` has one or more upstream `Industry`
 #[derive(Serialize, Deserialize, Debug)]
 struct Industry {
   name: String,
   kind: IndustryKind,
-  // upstream industries
+  /// upstream industries
+  /// * TODO: define material-product chain in product instead of industry?
   upstreams: Vec<String>,
   // services that may boost production of this industry(exclude equipment industry)
   boosters: Vec<String>,
+  // production capacity(Vec value, measured in output product units per cycle) of each level(Vec index)
+  // each type of products has its minimum level requirements,
+  // eg. Car.min_level = 3; and capacity from idx=3 may devote to car production
+  // higher level may produce more advanced car(more added value)
+  capacity: Vec<f32>,
+  // 
+  // production added value(Vec value) per 1 unit of upstream material for each level(Vec index)
+  added_value: Vec<f32>,
+  // scale of this industry
   // automation ratio(1~INF): scale up efficiency,
   // buy more and higher level equipments increase automation more
+  // the higher automation, the higher skill needed(entry bar) for workers
   automation: f32, // default: 1.0f (no automation)
+  // capacity: f32, // production capacity assuming unrestricted input
+  // FIXME: use a better model for equipment scaled efficiency and capacity
 }
 #[derive(Serialize, Deserialize, Debug)]
 struct Product {
