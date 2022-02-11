@@ -49,11 +49,10 @@ enum IndustryKind {
 /// # a `Industry` has one or more upstream `Industry`
 #[derive(Serialize, Deserialize, Debug)]
 struct Industry {
+  /// globally unique name of the industry
   name: String,
+  /// 1st(natural resource), 2nd(production) or 3rd(service) industry department
   kind: IndustryKind,
-  /// upstream industries
-  /// * TODO: define material-product chain in product instead of industry?
-  upstreams: Vec<String>,
   // services that may boost production of this industry(exclude equipment industry)
   boosters: Vec<String>,
   // production capacity(Vec value, measured in output product units per cycle) of each level(Vec index)
