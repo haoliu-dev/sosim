@@ -38,38 +38,72 @@ struct Science {
   level: u8,
 }
 
+/// defines a uniform level in all industries and workers
+/// level ordinal is defined by its position in `Society.Levels` array
+#[derive(Serialize, Deserialize, Debug)]
+struct Level {
+  /// a human-readable name for that level
+  /// level ordinal is defined by its position in `Society.Levels` array
+  name: String,
+
+  /// minimum cycle needed to upgrade to next level for both industry and worker
+  ///
+  /// 1. worker upgrade rules
+  /// worker's working cycle required to upgrade to next level.
+  /// once a worker has worked `upgrade_cycle` cycles, the worker may upgrade
+  /// to next level with certain chance, which gets higher with `worker.intelligence`
+  ///
+  /// 2. industry upgrade rules
+  /// industry running for `upgrade_cycle` cycles on current max level may
+  /// upgrade to next level with certain chance, which gets higher with
+  /// `industry.research`
+  upgrade_cycle: u16,
+
+  /// one worker of the same level may produce how many units of products in one cycle
+  /// this is used to determine how many workers are required for certain level and industry
+  /// capacity.
+  ///
+  /// a industry may produce `productivity * worker_count` units of products
+  /// (up to capacity for that level) for an given number in one industry
+  productivity: f32,
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 enum IndustryKind {
   NaturalResource = 1, // 1st
-  Production,             // 2nd
+  Production,          // 2nd
   Service,             // 3rd
 }
 
 /// This represents a whole Industry Department in the sim
-/// # a `Industry` has one or more upstream `Industry`
 #[derive(Serialize, Deserialize, Debug)]
 struct Industry {
   /// globally unique name of the industry
   name: String,
   /// 1st(natural resource), 2nd(production) or 3rd(service) industry department
   kind: IndustryKind,
-  // services that may boost production of this industry(exclude equipment industry)
-  boosters: Vec<String>,
-  // production capacity(Vec value, measured in output product units per cycle) of each level(Vec index)
-  // each type of products has its minimum level requirements,
-  // eg. Car.min_level = 3; and capacity from idx=3 may devote to car production
-  // higher level may produce more advanced car(more added value)
+
+  /// `<status>` production capacity of each level in this industry,
+  /// here's how it works:
+  /// 1. capacity(array) defines the maximum production unit per cycle(array element value)
+  ///  for that level(array element index)
+  /// 2. you add capacity of a certain level by adding the `equipment product` of
+  /// that level, that `product.is_equipment_for (Vec<String>)` must include
+  /// the name of this industry
+  /// 3. you may only produce up to the capacity given sufficient worker and input material
+  ///
+  /// For example, the following capacity means currently,
+  /// this industry has production capacity
+  /// of three levels(0,1,2), the production capacity for the
+  /// levels are 150, 20, 12 unit per cycle, respectively
+  /// ```
+  /// capacity = [150.0, 30.0, 12.0]
+  /// ```
   capacity: Vec<f32>,
-  // 
-  // production added value(Vec value) per 1 unit of upstream material for each level(Vec index)
-  added_value: Vec<f32>,
-  // scale of this industry
-  // automation ratio(1~INF): scale up efficiency,
-  // buy more and higher level equipments increase automation more
-  // the higher automation, the higher skill needed(entry bar) for workers
-  automation: f32, // default: 1.0f (no automation)
-  // capacity: f32, // production capacity assuming unrestricted input
-  // FIXME: use a better model for equipment scaled efficiency and capacity
+
+  /// accumulated research spending, the higher, the higher chance
+  /// to upgrade to next level once `level.upgrade_cycle` reached
+  research: f32,
 }
 #[derive(Serialize, Deserialize, Debug)]
 struct Product {
@@ -79,6 +113,7 @@ struct Product {
 // country is the whole model of the macro economy of player's context
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Society {
+  levels: Vec<Level>,
   industries: Vec<Industry>,
   sciences: Vec<Science>,
 }

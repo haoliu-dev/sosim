@@ -1,4 +1,11 @@
 {
+  "levels": [
+    {
+      "name": "门外汉",
+      "upgrade_cycle": 10,
+      "productivity": 1.0
+    }
+  ],
   "sciences": [
     {
       "name": "physics",
@@ -15,23 +22,20 @@
     {
       "name": "mining",
       "kind": "NaturalResource",
-      "upstreams": [],
-      "boosters": ["infrastructure"],
-      "automation": 1.0
+      "capacity": [10,20],
+      "research": 0
     },
     {
       "name": "equipment",
       "kind": "Production",
-      "upstreams": ["mining"],
-      "boosters": ["infrastructure"],
-      "automation": 1.0
+      "capacity": [],
+      "research": 0
     },
     {
       "name": "infrastructure",
       "kind": "Service",
-      "upstreams": [],
-      "boosters": [],
-      "automation": 1.0
+      "capacity": [],
+      "research": 0
     }
   ]
 }
