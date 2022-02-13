@@ -10,6 +10,8 @@ use person::Person;
 mod macro_sim;
 use macro_sim::Society;
 
+mod micro_sim;
+
 // sim the country with macro economy simulator
 pub fn start_macro_sim() -> io::Result<()>{
   let mut f = File::open("config/society.json")?;
