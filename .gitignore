@@ -4,3 +4,5 @@
 
 # for mac snapshot
 .DS_Store
+# ignore local markdown preview
+README.html
