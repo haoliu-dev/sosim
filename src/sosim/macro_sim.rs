@@ -38,10 +38,6 @@ struct Science {
   level: u8,
 }
 
-
-
-
-
 /// defines a level in one industries
 #[derive(Serialize, Deserialize, Debug)]
 struct IndustryLevel {
@@ -83,55 +79,31 @@ struct Industry {
   name: String,
 
   //--- characteristics ---//
-
   /// products it makes
   products: Vec<Product>,
 
-  /// levels for this industry.
-  /// Different industry has different characteristics, like:
-  /// upgrade requirement and productivity
-  levels: Vec<IndustryLevel>,
-
-  /// `<status>` production capacity of each level in this industry,
-  /// here's how it works:
-  /// 1. capacity(array) defines the maximum production unit per cycle(array element value)
-  ///  for that level(array element index)
-  /// 2. you add capacity of a certain level by adding `Equipment` which is the output
-  /// of an industry whose product_type is `Equipment`
-  /// 3. you may only produce up to the capacity given sufficient worker and input material
-  ///
-  /// For example, the following capacity means currently,
-  /// this industry has production capacity
-  /// of three levels(0,1,2), the production capacity for the
-  /// levels are 150, 20, 12 unit per cycle, respectively
-  /// ```
-  /// capacity = [150.0, 30.0, 12.0]
-  /// ```
-  // capacity: Vec<f32>,
-
-  /// how many units of equipment invested
-  equipments: f32,
-
-  /// researchers hired
-  researcher: u32,
-  /// workers hired
-  worker: u32,
-
+  capacities: Vec<Productivity>,
   // settings
-
 }
 
-// #[derive(Serialize, Deserialize, Debug)]
-// enum ProductType {
-//   /// argriculture, fishing, natural resources, coal, metal, gas...
-//   Material,
-//   /// increase industry capacity: equipment industry
-//   Equipment,
-//   /// end consumer goods of all kinds
-//   ConsumerGoods,
-//   /// provides service to industry and consumer
-//   Service,
-// }
+/// This is a special kind of products only useful to `Industry`, which
+/// may acquire production output by buying `Productivity` from an `Equipment
+/// Producer` or `Service Industry`.
+/// https://en.wikipedia.org/wiki/Productivity
+#[derive(Serialize, Deserialize, Debug)]
+struct Productivity {
+  /// the level of products produced and worker skill required
+  level: u32,
+  /// productivity(entropy reduction) in one step, can be negative
+  /// a law or requirement may reduce the capacity
+  output: f32,
+  /// worker required, can be negative, `Service` may reduce the
+  /// total worker required
+  worker: f32,
+  /// when(which step) it expires
+  expiration: u32,
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 struct ProductRecipe {
   name: String,
